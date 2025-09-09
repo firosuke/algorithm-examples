@@ -18,13 +18,15 @@ from math import isqrt
 
 # To achieve this, we maintain a sorted list of CONSECUTIVE primes -- possibly
 # smaller than k -- which are a subset of the indices where prime[i] is True.
+# (This list is called "primes".)
 
 # If our sieving has uncovered any new primes adjacent to this list,
 # we add them to the list of consecutive primes.
 
 # To maintain this list more efficiently, we also keep track of
-# the largest range of CONSECUTIVE numbers 0...m for which primality is known
-# to be true or false. The last such index is recorded in variable cts_until.
+# the largest range of CONSECUTIVE numbers 0...m, a superset of primes,
+# for which primality is known to be true or false.
+# The last such index is recorded in variable cts_until.
 
 
 prime = [False, False, True]
@@ -63,12 +65,14 @@ def is_prime(n):
             # If r has been sieved out (is known not to be prime), ignore it
             if prime[r] is False:
                 continue
-            # We don't know if r is prime. Recursively sieve it using all known
-            # primes (which also updates cts_until and primes if necessary).
-            # Then, if r is found to be prime, also check if r divides n.
-            # If so, stop sieving: n is known to be non-prime.
+            # If r is known to be prime (from a previous call to is_prime),
+            # check if r divides n.
+            # If we don't know whether or not r is prime, we can check by
+            # recursively calling is_prime(r), which has the side-effect of
+            # updating cts_until and primes if necessary.
+            # If r divides n, stop sieving: n is now known to be non-prime.
             else:
-                if prime[r] is None and is_prime(r):
+                if prime[r] or is_prime(r):
                     if n % r == 0:
                         prime[n] = False
                         break
@@ -84,11 +88,14 @@ def is_prime(n):
     # This requires updating cts_until and primes.
     for i in range(cts_until + 1, len(prime) + 1):
         if i == len(prime) or prime[i] is None:
-            # We processed the whole list or found the first non-known prime[i]
+            # Either prime[i] is known for all indices (i == len(prime)),
+            # or we found the first i where prime[i] is unknown.
+            # Either way, the continuous range of known indices is <= i - 1
             cts_until = i - 1
             break
         elif prime[i]:
-            # Add this prime to the list (no need to update cts_until here)
+            # This prime is the next one after the list of primes,
+            # so add it to the list (no need to update cts_until here)
             primes.append(i)
     
     return prime[n]
