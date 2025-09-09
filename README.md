@@ -23,5 +23,3 @@ To achieve this sieving, we maintain a sorted list of CONSECUTIVE primes -- poss
 If our sieving has uncovered any new primes adjacent to this list, we add them to the list of consecutive primes.
 
 To maintain the list more efficiently, we also keep track of the largest range of CONSECUTIVE numbers `0 ... m` for which primality is known to be true or false -- a superset of `primes`. The last such index is recorded in variable `cts_until`.
-
-*P.S. I'm sure you are deeply concerned to ask if `0` is prime or not? I'll just observe that every natural number divides it with a remainder of zero. How about negative numbers? Please refer to the zeroes of the Riemann zeta function for further details and stop pestering me.*
